@@ -1,0 +1,11 @@
+{
+  "checked_on": "2026-10-19",
+  "tests_run": 18,
+  "failures": 0,
+  "errors": 0,
+  "passed": true,
+  "python": "3.12.14",
+  "sqlite": "3.53.1",
+  "scope": "Synthetic in-memory snapshot tests. No production-scale or LLM evaluation claim.",
+  "source_sha256": "dd7fb93e96e00db92ada36e3cf3b550bd462ab00476f85e4a13e7eef18b3288d"
+}

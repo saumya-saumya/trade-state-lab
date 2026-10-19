@@ -1,0 +1,277 @@
+[
+  {
+    "id": "late-arrival",
+    "title": "An older version arrives late",
+    "description": "T1 version 1 arrives after version 2. Arrival order must not override business version.",
+    "events": [
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "arrival_seq": 1,
+        "status": "ACTIVE",
+        "notional_minor": 10000,
+        "currency": "USD"
+      },
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 2,
+        "arrival_seq": 2,
+        "status": "ACTIVE",
+        "notional_minor": 12000,
+        "currency": "USD"
+      },
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "arrival_seq": 3,
+        "status": "ACTIVE",
+        "notional_minor": 10000,
+        "currency": "USD"
+      }
+    ],
+    "expected": {
+      "latest": [
+        {
+          "source": "SIM",
+          "trade_id": "T1",
+          "version": 2,
+          "status": "ACTIVE",
+          "notional_minor": 12000,
+          "currency": "USD"
+        }
+      ],
+      "active": [
+        {
+          "source": "SIM",
+          "trade_id": "T1",
+          "version": 2,
+          "status": "ACTIVE",
+          "notional_minor": 12000,
+          "currency": "USD"
+        }
+      ],
+      "quarantined": [],
+      "conflicting_keys": [],
+      "input_records": 3,
+      "distinct_event_keys": 2,
+      "replay_records": 1
+    },
+    "expected_packet": {
+      "source": "SIM",
+      "trade_id": "T1",
+      "serving_eligible": true,
+      "reason": "Validated latest state; a cancellation must not be described as active.",
+      "evidence": {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 2,
+        "status": "ACTIVE",
+        "notional_minor": 12000,
+        "currency": "USD"
+      }
+    }
+  },
+  {
+    "id": "cancellation",
+    "title": "A cancelled trade reappears",
+    "description": "Filtering for ACTIVE first discards the cancellation and revives the old trade. Choose the latest state before filtering active trades.",
+    "events": [
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "arrival_seq": 1,
+        "status": "ACTIVE",
+        "notional_minor": 10000,
+        "currency": "USD"
+      },
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 2,
+        "arrival_seq": 2,
+        "status": "CANCELLED",
+        "notional_minor": 10000,
+        "currency": "USD"
+      }
+    ],
+    "expected": {
+      "latest": [
+        {
+          "source": "SIM",
+          "trade_id": "T1",
+          "version": 2,
+          "status": "CANCELLED",
+          "notional_minor": 10000,
+          "currency": "USD"
+        }
+      ],
+      "active": [],
+      "quarantined": [],
+      "conflicting_keys": [],
+      "input_records": 2,
+      "distinct_event_keys": 2,
+      "replay_records": 0
+    },
+    "expected_packet": {
+      "source": "SIM",
+      "trade_id": "T1",
+      "serving_eligible": true,
+      "reason": "Validated latest state; a cancellation must not be described as active.",
+      "evidence": {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 2,
+        "status": "CANCELLED",
+        "notional_minor": 10000,
+        "currency": "USD"
+      }
+    }
+  },
+  {
+    "id": "replay",
+    "title": "The same input is replayed",
+    "description": "An exact business-event replay changes raw input count, not the canonical state or notional. No cross-currency aggregation is performed.",
+    "events": [
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "arrival_seq": 1,
+        "status": "ACTIVE",
+        "notional_minor": 10000,
+        "currency": "USD"
+      },
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "arrival_seq": 2,
+        "status": "ACTIVE",
+        "notional_minor": 10000,
+        "currency": "USD"
+      },
+      {
+        "source": "SIM",
+        "trade_id": "T2",
+        "version": 1,
+        "arrival_seq": 3,
+        "status": "ACTIVE",
+        "notional_minor": 5000,
+        "currency": "EUR"
+      }
+    ],
+    "expected": {
+      "latest": [
+        {
+          "source": "SIM",
+          "trade_id": "T1",
+          "version": 1,
+          "status": "ACTIVE",
+          "notional_minor": 10000,
+          "currency": "USD"
+        },
+        {
+          "source": "SIM",
+          "trade_id": "T2",
+          "version": 1,
+          "status": "ACTIVE",
+          "notional_minor": 5000,
+          "currency": "EUR"
+        }
+      ],
+      "active": [
+        {
+          "source": "SIM",
+          "trade_id": "T1",
+          "version": 1,
+          "status": "ACTIVE",
+          "notional_minor": 10000,
+          "currency": "USD"
+        },
+        {
+          "source": "SIM",
+          "trade_id": "T2",
+          "version": 1,
+          "status": "ACTIVE",
+          "notional_minor": 5000,
+          "currency": "EUR"
+        }
+      ],
+      "quarantined": [],
+      "conflicting_keys": [],
+      "input_records": 3,
+      "distinct_event_keys": 2,
+      "replay_records": 1
+    },
+    "expected_packet": {
+      "source": "SIM",
+      "trade_id": "T1",
+      "serving_eligible": true,
+      "reason": "Validated latest state; a cancellation must not be described as active.",
+      "evidence": {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "status": "ACTIVE",
+        "notional_minor": 10000,
+        "currency": "USD"
+      }
+    }
+  },
+  {
+    "id": "conflict",
+    "title": "One version has conflicting payloads",
+    "description": "Two different amounts claim to be the same source/trade/version. A convenient ingestion timestamp cannot establish which is correct. This conservative example quarantines the trade.",
+    "events": [
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "arrival_seq": 1,
+        "status": "ACTIVE",
+        "notional_minor": 10000,
+        "currency": "USD"
+      },
+      {
+        "source": "SIM",
+        "trade_id": "T1",
+        "version": 1,
+        "arrival_seq": 2,
+        "status": "ACTIVE",
+        "notional_minor": 99900,
+        "currency": "USD"
+      }
+    ],
+    "expected": {
+      "latest": [],
+      "active": [],
+      "quarantined": [
+        {
+          "source": "SIM",
+          "trade_id": "T1"
+        }
+      ],
+      "conflicting_keys": [
+        {
+          "source": "SIM",
+          "trade_id": "T1",
+          "version": 1
+        }
+      ],
+      "input_records": 2,
+      "distinct_event_keys": 1,
+      "replay_records": 0
+    },
+    "expected_packet": {
+      "source": "SIM",
+      "trade_id": "T1",
+      "serving_eligible": false,
+      "reason": "Conflicting business-version payloads require review.",
+      "evidence": null
+    }
+  }
+]

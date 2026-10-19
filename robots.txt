@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://saumya-saumya.github.io/trade-state-lab/sitemap.xml
